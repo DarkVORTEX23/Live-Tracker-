@@ -1,0 +1,9 @@
+🔑 Important: Ngrok AuthToken Setup (One-Time Only)
+This tool uses Ngrok to automatically generate a public tracking link. According to Ngrok's updated policies, every user must configure a free AuthToken to avoid connection errors.
+If you don't have a token yet, follow these steps:
+1 Create a Free Account:
+Go to dashboard.ngrok.com and sign up or log in to your free account.
+2 Copy Your AuthToken:
+Once logged in, copy your unique token from the Your Authtoken section on your dashboard.
+3 First-Time Execution:
+When you run the script for the first time, it will automatically prompt you for your token:
