@@ -10,6 +10,8 @@ import time
 import urllib.request
 import urllib.error
 
+from openai import __name
+
 PORT = 8080
 
 # Advanced Cyberpunk HTML Template with Telemetry & Fingerprinting
@@ -229,7 +231,7 @@ def get_ngrok_url():
             time.sleep(1)
     return None
 
-if _name_ == "_main_":
+if __name == "_main_":
     os.system('clear' if os.name == 'posix' else 'cls')
     print("\033[1;31m")
     print(r"""
